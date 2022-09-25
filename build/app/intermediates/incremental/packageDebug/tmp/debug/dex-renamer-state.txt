@@ -1,0 +1,4 @@
+#Sat Sep 24 17:58:04 IST 2022
+base.0=/Users/macbookpro12/Documents/Harsh Shah/model_add_demo/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
