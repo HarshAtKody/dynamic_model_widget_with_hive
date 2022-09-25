@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:model_add_demo/box/boxs.dart';
 import 'package:model_add_demo/model/education_model.dart';
 
 class EducationScreen extends StatefulWidget {
@@ -11,8 +13,6 @@ class EducationScreen extends StatefulWidget {
 
 class _EducationScreenState extends State<EducationScreen> {
 
-
-  List<EducationModel> educationList = [];
   EducationModel? educationModel;
 
 
@@ -23,6 +23,12 @@ class _EducationScreenState extends State<EducationScreen> {
   FocusNode educationNameFocus = FocusNode();
   FocusNode educationYearFocus = FocusNode();
   FocusNode instituteFocus = FocusNode();
+
+  @override
+  void dispose() {
+    Hive.box("educationmodel").close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +92,12 @@ class _EducationScreenState extends State<EducationScreen> {
                       onPressed: (){
                       setState(() {
                         if(educationNameCTR.text != '' && educationYearCTR.text != '' && instituteCTR.text != ''){
-                          educationList.add(EducationModel(educationNameCTR.text, educationYearCTR.text, instituteCTR.text));
+                          // final educationModel = EducationModel()
+                          //   ..educationTypeCTR = educationNameCTR.text
+                          //   ..educationYearCTR = educationYearCTR.text
+                          //   ..instituteNameCTR = instituteCTR.text;
+                          // educationList.add(educationModel);
+                          addDataIntoModel();
 
                           educationNameCTR.clear();
                           educationYearCTR.clear();
@@ -99,64 +110,80 @@ class _EducationScreenState extends State<EducationScreen> {
             ),
 
             const SizedBox(height: 20,),
-            Visibility(
-              visible: educationList.isNotEmpty,
-              child: ListView.separated(
-                physics:const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                separatorBuilder: (context, index){
-                  return const SizedBox(height: 20,);
-                },
-                itemBuilder: (context, i) {
-                  String educationType = educationList[i].educationTypeCTR;
-                  String educationYear = educationList[i].educationYearCTR;
-                  String instituteName = educationList[i].instituteNameCTR;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Card(
-                      color: Colors.white,
-                      elevation: 5,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: Column(
-                              children: [
-                                const SizedBox(height: 20,),
-                                Text(educationType, style: const TextStyle(fontSize: 16,color: Colors.black87),),
-                                const SizedBox(height: 20,),
-                                Text(educationYear, style: const TextStyle(fontSize: 16,color: Colors.black87),),
-                                const SizedBox(height: 20,),
-                                Text(instituteName, style: const TextStyle(fontSize: 16,color: Colors.black87),),
-                                const SizedBox(height: 20,),
-                              ],
-                            ),
-                          ),
-                          InkWell(
-                            onTap: (){
-                              setState(() {
-                                educationList.removeAt(i);
-                              });
-                            },
-                            child: Container(
-                              height: 30,
-                              width: 30,
-                              decoration:  BoxDecoration(
-                                color: Colors.red,borderRadius: BorderRadius.circular(25)
+            ValueListenableBuilder<Box<EducationModel>>(
+              valueListenable: Boxes.getEducationListData().listenable(),
+              builder: (context, box, _) {
+                final transactions = box.values.toList().cast<EducationModel>();
+                return ListView.separated(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  separatorBuilder: (context, index){
+                    return const SizedBox(height: 20,);
+                  },
+                  itemBuilder: (context, i) {
+                    String educationType = transactions[i].educationTypeCTR;
+                    String educationYear = transactions[i].educationYearCTR;
+                    String instituteName = transactions[i].instituteNameCTR;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Card(
+                        color: Colors.white,
+                        elevation: 5,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 20,),
+                                  Text(educationType, style: const TextStyle(fontSize: 16,color: Colors.black87),),
+                                  const SizedBox(height: 20,),
+                                  Text(educationYear, style: const TextStyle(fontSize: 16,color: Colors.black87),),
+                                  const SizedBox(height: 20,),
+                                  Text(instituteName, style: const TextStyle(fontSize: 16,color: Colors.black87),),
+                                  const SizedBox(height: 20,),
+                                ],
                               ),
-                                child:const Center(child:  Icon(Icons.remove,size: 25, color: Colors.white),)),
-                          ),
-                          const SizedBox(width: 20)
-                        ],
+                            ),
+                            InkWell(
+                              onTap: (){
+                                setState(() {
+
+                                  transactions[i].delete();
+                                });
+                              },
+                              child: Container(
+                                height: 30,
+                                width: 30,
+                                decoration:  BoxDecoration(
+                                  color: Colors.red,borderRadius: BorderRadius.circular(25)
+                                ),
+                                  child:const Center(child:  Icon(Icons.remove,size: 25, color: Colors.white),)),
+                            ),
+                            const SizedBox(width: 20)
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                }, itemCount: educationList.length,
-              ),
+                    );
+                  }, itemCount: transactions.length,
+                );
+              }
             ),
           ],
         ),
       ),
     );
+  }
+
+
+  addDataIntoModel(){
+    final educationModel = EducationModel()
+      ..educationTypeCTR = educationNameCTR.text
+      ..educationYearCTR = educationYearCTR.text
+      ..instituteNameCTR = instituteCTR.text;
+
+      final box = Boxes.getEducationListData();
+      box.add(educationModel);
+
   }
 }
