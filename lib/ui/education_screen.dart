@@ -92,13 +92,10 @@ class _EducationScreenState extends State<EducationScreen> {
                       onPressed: (){
                       setState(() {
                         if(educationNameCTR.text != '' && educationYearCTR.text != '' && instituteCTR.text != ''){
-                          // final educationModel = EducationModel()
-                          //   ..educationTypeCTR = educationNameCTR.text
-                          //   ..educationYearCTR = educationYearCTR.text
-                          //   ..instituteNameCTR = instituteCTR.text;
-                          // educationList.add(educationModel);
+                          /// Add Data Into List
                           addDataIntoModel();
 
+                          /// Clear Text Field
                           educationNameCTR.clear();
                           educationYearCTR.clear();
                           instituteCTR.clear();
@@ -113,7 +110,7 @@ class _EducationScreenState extends State<EducationScreen> {
             ValueListenableBuilder<Box<EducationModel>>(
               valueListenable: Boxes.getEducationListData().listenable(),
               builder: (context, box, _) {
-                final transactions = box.values.toList().cast<EducationModel>();
+                final educationList = box.values.toList().cast<EducationModel>();
                 return ListView.separated(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
@@ -121,9 +118,9 @@ class _EducationScreenState extends State<EducationScreen> {
                     return const SizedBox(height: 20,);
                   },
                   itemBuilder: (context, i) {
-                    String educationType = transactions[i].educationTypeCTR;
-                    String educationYear = transactions[i].educationYearCTR;
-                    String instituteName = transactions[i].instituteNameCTR;
+                    String educationType = educationList[i].educationTypeCTR;
+                    String educationYear = educationList[i].educationYearCTR;
+                    String instituteName = educationList[i].instituteNameCTR;
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Card(
@@ -133,23 +130,27 @@ class _EducationScreenState extends State<EducationScreen> {
                           children: [
                             Expanded(
                               flex: 3,
-                              child: Column(
-                                children: [
-                                  const SizedBox(height: 20,),
-                                  Text(educationType, style: const TextStyle(fontSize: 16,color: Colors.black87),),
-                                  const SizedBox(height: 20,),
-                                  Text(educationYear, style: const TextStyle(fontSize: 16,color: Colors.black87),),
-                                  const SizedBox(height: 20,),
-                                  Text(instituteName, style: const TextStyle(fontSize: 16,color: Colors.black87),),
-                                  const SizedBox(height: 20,),
-                                ],
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 20,),
+                                    Text("Degree: $educationType", style: const TextStyle(fontSize: 16,color: Colors.black87, fontWeight: FontWeight.bold),),
+                                    const SizedBox(height: 20,),
+                                    Text("Year: $educationYear", style: const TextStyle(fontSize: 16,color: Colors.black87, fontWeight: FontWeight.bold),),
+                                    const SizedBox(height: 20,),
+                                    Text("Institute: $instituteName", style: const TextStyle(fontSize: 16,color: Colors.black87, fontWeight: FontWeight.bold),),
+                                    const SizedBox(height: 20,),
+                                  ],
+                                ),
                               ),
                             ),
                             InkWell(
                               onTap: (){
                                 setState(() {
-
-                                  transactions[i].delete();
+                                  /// Delete
+                                  educationList[i].delete();
                                 });
                               },
                               child: Container(
@@ -165,7 +166,7 @@ class _EducationScreenState extends State<EducationScreen> {
                         ),
                       ),
                     );
-                  }, itemCount: transactions.length,
+                  }, itemCount: educationList.length,
                 );
               }
             ),
