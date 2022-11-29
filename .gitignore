@@ -68,3 +68,11 @@ app.*.map.json
 /build/app/
 *.cmake
 windows/flutter/ephemeral/.plugin_symlinks/connectivity_plus_windows
+*.json
+*.flat
+*.jar
+*.stamp
+build/app/intermediates/annotation_processor_list/debug/annotationProcessors.json
+build/app/intermediates/apk_ide_redirect_file/debug/redirect.txt
+build/app/intermediates/app_metadata/debug/app-metadata.properties
+*.stamp
